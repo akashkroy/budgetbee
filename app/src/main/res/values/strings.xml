@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">BudgetBee</string>
+    <string-array name="transaction_types">
+        <item>All</item>
+        <item>Credit</item>
+        <item>Debit</item>
+    </string-array>
+</resources>

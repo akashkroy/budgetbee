@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Date Filter -->
+    <TextView
+        android:text="Date"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:selectionRequired="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipToday"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:text="Today"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:checkedIconVisible="false" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipWeek"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:text="This week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:checkedIconVisible="false" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipMonth"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:text="This month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:checkedIconVisible="false" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <!-- Category Filter -->
+    <TextView
+        android:text="Category"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroupCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/buttonReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/buttonApply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apply Filters" />
+    </LinearLayout>
+
+</LinearLayout>
