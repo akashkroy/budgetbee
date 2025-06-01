@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.DayOfWeek
+import androidx.recyclerview.widget.ItemTouchHelper
+import com.google.android.material.snackbar.Snackbar
 
 class TransactionsFragment : Fragment() {
 
@@ -41,11 +43,49 @@ class TransactionsFragment : Fragment() {
         chipGroupType = view.findViewById(R.id.chipGroupType)
         chipMoreFilters = view.findViewById(R.id.chipMoreFilters)
 
-        adapter = TransactionAdapter()
+        val dao = AppDatabase.getDatabase(requireContext()).transactionDao()
+
+
+        adapter = TransactionAdapter { transaction ->
+            AddOrEditTransactionBottomSheet(
+                onSubmit = { updatedTransaction ->
+                    lifecycleScope.launch {
+                        dao.updateTransaction(updatedTransaction)
+                    }
+                },
+                existingTransaction = transaction
+            ).show(parentFragmentManager, "EditTransactionBottomSheet")
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
-        val dao = AppDatabase.getDatabase(requireContext()).transactionDao()
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ) = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.bindingAdapterPosition
+                val transaction = adapter.currentList[position]
+
+                // Remove from DB
+                lifecycleScope.launch {
+                    dao.deleteTransaction(transaction)
+                }
+
+                Snackbar.make(recyclerView, "Transaction deleted", Snackbar.LENGTH_LONG)
+                    .setAction("UNDO") {
+                        // Re-insert on undo
+                        lifecycleScope.launch {
+                            dao.insertTransaction(transaction)
+                        }
+                    }.show()
+            }
+        })
+        itemTouchHelper.attachToRecyclerView(recyclerView)
 
         val updateFilter = {
             val selectedType = when (chipGroupType.checkedChipId) {

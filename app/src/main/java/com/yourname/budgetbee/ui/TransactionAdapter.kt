@@ -10,12 +10,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.yourname.budgetbee.R
 import com.yourname.budgetbee.data.models.Transaction
 
-class TransactionAdapter : ListAdapter<Transaction, TransactionAdapter.TransactionViewHolder>(DiffCallback()) {
+class TransactionAdapter(
+    private val onTransactionLongClick: (Transaction) -> Unit
+) : ListAdapter<Transaction, TransactionAdapter.TransactionViewHolder>(DiffCallback()) {
 
     inner class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textAmount: TextView = itemView.findViewById(R.id.textAmount)
         val textCategory: TextView = itemView.findViewById(R.id.textCategory)
         val textDate: TextView = itemView.findViewById(R.id.textDate)
+
+        init {
+            itemView.setOnLongClickListener {
+                val pos = bindingAdapterPosition
+                if (pos != RecyclerView.NO_POSITION) {
+                    onTransactionLongClick(getItem(pos))
+                }
+                true
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {

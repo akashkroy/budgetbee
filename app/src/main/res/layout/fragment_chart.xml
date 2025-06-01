@@ -1,9 +1,110 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/pieChart"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <!-- Type filter chips -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupChartType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="All"
+                android:checked="true" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipCredit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="Credit" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDebit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="Debit" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Date filter chips -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupChartDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipDateAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="All"
+                android:checked="true" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipToday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="Today" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipThisWeek"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="This Week" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipThisMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="This Month" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipPrevMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="Prev. Month" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chipThisYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:text="This Year" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- The Pie Chart -->
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/textSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:gravity="center"
+            android:text="Category Totals"/>
+    </LinearLayout>
 </FrameLayout>

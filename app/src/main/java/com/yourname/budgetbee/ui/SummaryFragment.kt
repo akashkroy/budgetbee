@@ -17,12 +17,12 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.yourname.budgetbee.R
 import com.yourname.budgetbee.data.database.AppDatabase
 import com.yourname.budgetbee.data.models.MonthlySummary
-import com.yourname.budgetbee.data.models.Transaction
 import com.yourname.budgetbee.util.SmsParser
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 class SummaryFragment : Fragment() {
 
@@ -59,12 +59,16 @@ class SummaryFragment : Fragment() {
 
         fab = view.findViewById(R.id.fabAddTransaction)
         fab.setOnClickListener {
-            AddTransactionBottomSheet { transaction ->
-                lifecycleScope.launch {
-                    dao.insertTransaction(transaction)
-                }
-            }.show(parentFragmentManager, "AddTransactionBottomSheet")
+            AddOrEditTransactionBottomSheet(
+                onSubmit = { transaction ->
+                    lifecycleScope.launch {
+                        dao.insertTransaction(transaction)
+                    }
+                },
+                existingTransaction = null
+            ).show(parentFragmentManager, "AddTransactionBottomSheet")
         }
+
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_SMS)
             != PackageManager.PERMISSION_GRANTED

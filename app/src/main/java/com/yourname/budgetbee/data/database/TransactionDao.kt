@@ -49,5 +49,11 @@ interface TransactionDao {
         endDate: String?
     ): Flow<List<Transaction>>
 
+    @Update
+    suspend fun updateTransaction(transaction: Transaction)
+
+    @Delete
+    suspend fun deleteTransaction(transaction: Transaction)
+
 
 }
