@@ -5,4 +5,10 @@
         <item>Credit</item>
         <item>Debit</item>
     </string-array>
+
+    <!-- Added for summary cards -->
+    <string name="current_month">Current Month</string>
+    <string name="top_category">Top Category</string>
+    <string name="monthly_change">Monthly Change</string>
+    <string name="average_daily">Avg Daily Spend</string>
 </resources>

@@ -23,13 +23,19 @@ import kotlinx.coroutines.flow.collectLatest
 import java.text.SimpleDateFormat
 import java.util.*
 
-
 class SummaryFragment : Fragment() {
 
     private lateinit var adapter: SummaryAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var fab: ExtendedFloatingActionButton
+
+    // New views for insights and current month stats
+    private lateinit var textCurrentMonthTitle: TextView
+    private lateinit var textCurrentMonthStats: TextView
+    private lateinit var textTopCategoryValue: TextView
+    private lateinit var textMonthlyChangeValue: TextView
+    private lateinit var textAvgDailySpendValue: TextView
 
     private val dao by lazy {
         AppDatabase.getDatabase(requireContext()).transactionDao()
@@ -47,6 +53,14 @@ class SummaryFragment : Fragment() {
         recyclerView.adapter = adapter
 
         progressBar = view.findViewById(R.id.progressBar)
+        fab = view.findViewById(R.id.fabAddTransaction)
+
+        // New bindings
+        textCurrentMonthTitle = view.findViewById(R.id.textCurrentMonthTitle)
+        textCurrentMonthStats = view.findViewById(R.id.textCurrentMonthStats)
+        textTopCategoryValue = view.findViewById(R.id.textTopCategoryValue)
+        textMonthlyChangeValue = view.findViewById(R.id.textMonthlyChangeValue)
+        textAvgDailySpendValue = view.findViewById(R.id.textAvgDailySpendValue)
 
         val refreshButton = view.findViewById<Button>(R.id.btnRefreshSMS)
         refreshButton.setOnClickListener {
@@ -57,7 +71,6 @@ class SummaryFragment : Fragment() {
             }
         }
 
-        fab = view.findViewById(R.id.fabAddTransaction)
         fab.setOnClickListener {
             AddOrEditTransactionBottomSheet(
                 onSubmit = { transaction ->
@@ -68,7 +81,6 @@ class SummaryFragment : Fragment() {
                 existingTransaction = null
             ).show(parentFragmentManager, "AddTransactionBottomSheet")
         }
-
 
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_SMS)
             != PackageManager.PERMISSION_GRANTED
@@ -93,18 +105,60 @@ class SummaryFragment : Fragment() {
         lifecycleScope.launch {
             dao.getAllTransactions().collectLatest { transactions ->
                 val monthFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 val grouped = transactions.groupBy {
-                    monthFormat.format(SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(it.date) ?: Date())
+                    monthFormat.format(dateFormat.parse(it.date) ?: Date())
                 }
 
                 val summaryList = grouped.map { (month, items) ->
                     val income = items.filter { it.type == "credit" }.sumOf { it.amount }
                     val expense = items.filter { it.type == "debit" }.sumOf { it.amount }
-                    val parsedDate = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).parse(month) ?: Date()
+                    val parsedDate = monthFormat.parse(month) ?: Date()
                     Pair(MonthlySummary(month, income, expense), parsedDate)
                 }.sortedByDescending { it.second }
                     .map { it.first }
 
+                // === Current Month Insights ===
+                val now = Calendar.getInstance()
+                val thisMonthKey = monthFormat.format(now.time)
+                val thisMonthTx = transactions.filter {
+                    monthFormat.format(dateFormat.parse(it.date) ?: Date()) == thisMonthKey
+                }
+
+                // Set current month title (e.g., "June 2025")
+                textCurrentMonthTitle.text = thisMonthKey
+
+                // Calculate and show Income & Expense for current month
+                val currIncome = thisMonthTx.filter { it.type == "credit" }.sumOf { it.amount }
+                val currExp = thisMonthTx.filter { it.type == "debit" }.sumOf { it.amount }
+                textCurrentMonthStats.text = "Income: ₹%.0f   Expense: ₹%.0f".format(currIncome, currExp)
+
+                // Top Spending Category (debit)
+                val topCategory = thisMonthTx
+                    .filter { it.type == "debit" }
+                    .groupBy { it.category }
+                    .mapValues { it.value.sumOf { tx -> tx.amount } }
+                    .maxByOrNull { it.value }
+                textTopCategoryValue.text = if (topCategory != null)
+                    "${topCategory.key}: ₹%.0f".format(topCategory.value)
+                else "—"
+
+                // Monthly Change (%)
+                val calPrev = Calendar.getInstance().apply { add(Calendar.MONTH, -1) }
+                val prevMonthKey = monthFormat.format(calPrev.time)
+                val prevMonthTx = transactions.filter {
+                    monthFormat.format(dateFormat.parse(it.date) ?: Date()) == prevMonthKey
+                }
+                val prevExp = prevMonthTx.filter { it.type == "debit" }.sumOf { it.amount }
+                val monthlyChange = if (prevExp != 0.0) ((currExp - prevExp) / prevExp * 100) else 0.0
+                textMonthlyChangeValue.text = "%+.1f%%".format(monthlyChange)
+
+                // Average Daily Spend (for current month)
+                val daysInMonth = now.getActualMaximum(Calendar.DAY_OF_MONTH)
+                val avgDaily = if (daysInMonth > 0) currExp / daysInMonth else 0.0
+                textAvgDailySpendValue.text = "₹%.0f".format(avgDaily)
+
+                // Update the RecyclerView (history list)
                 adapter.updateData(summaryList)
             }
         }
